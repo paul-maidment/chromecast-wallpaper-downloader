@@ -13,16 +13,15 @@ raw = re.findall(b"(JSON\.parse\('.+'\))\)\.", rawChromecastHomeHTML)[0]
 filtered = raw.replace(b"\\x5b",b"[").replace(b"\\x22", b"\"").replace(b"\\/", b"/").replace(b"\\\\u003d", b"=").replace(b"\\x5d", b"]").replace(b"JSON.parse(\'", b"").split(b"]]]],[")
 j = filtered[0].decode('utf-8') + "]]]]]"
 decoded = json.loads(j)
-i = 1
 for item in decoded[0]:
     response = requests.get(item[0])
     filename, extension = os.path.splitext(item[0])
 
-    if len(response.content) > 5000:
-        outfilename = hashlib.md5(response.content)
+    outfilename = hashlib.md5(response.content)
+
+    if len(response.content) > 5000 and os.path.isfile(os.path.expanduser('~') + "/Pictures/downloaded-backgrounds/" + outfilename.hexdigest() + ".jpg") == False:
         of = open(
             os.path.expanduser('~')
-            + "/Pictures/downloaded-backgrounds/" + outfilename.hexdigest() + "." + extension, "wb")
+            + "/Pictures/downloaded-backgrounds/" + outfilename.hexdigest() + ".jpg" , "wb")
         of.write(response.content)
-        i += 1
         sleep(0.25)
